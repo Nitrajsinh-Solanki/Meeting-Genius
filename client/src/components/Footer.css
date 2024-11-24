@@ -1,0 +1,8 @@
+
+.footer-newname {
+  display: flex;
+  color: whitesmoke;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}

@@ -1,0 +1,62 @@
+
+.header {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: linear-gradient(to right, #4caf50, #81c784);
+    color: white;
+    padding: 10px 0px;
+   
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    left: 0;
+    z-index: 1000;
+  }
+  
+  .header-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin: 0;
+  }
+  
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+  }
+  
+  .username {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  button {
+    padding: 8px 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .login-btn {
+    background-color: #2196f3;
+  }
+  
+  .login-btn:hover {
+    background-color: #1976d2;
+  }
+  
+  .logout-btn {
+    background-color: #f44336;
+  }
+  
+  .logout-btn:hover {
+    background-color: #d32f2f;
+  }
+  
