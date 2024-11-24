@@ -1,4 +1,3 @@
-Here is the updated **README.md** file with the provided image links added:
 
 ---
 
