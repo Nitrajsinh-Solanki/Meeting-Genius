@@ -4,10 +4,6 @@
 # 🚀 Meeting Insights Generator  
 _A Comprehensive Solution for Meeting Transcriptions, Summarizations, and Insights Visualization_
 
-[![Demo Video](https://img.shields.io/badge/Demo-YouTube-red)](https://youtu.be/x_GMz0qJ9Zg)  
-[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)  
-[![Hackathon Submission](https://img.shields.io/badge/Challenge-Multimodal%20GenAI-orange)](https://hackathon.example.com)
-
 ---
 
 ## 🌟 About the Project  
