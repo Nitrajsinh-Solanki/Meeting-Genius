@@ -61,7 +61,7 @@ Follow these steps to set up the project locally:
 2. **Backend Setup**  
    - Navigate to the server directory:  
      ```bash
-     cd Meeting-Genius/server
+     cd server
      ```  
    - Install dependencies:  
      ```bash
@@ -86,7 +86,7 @@ Follow these steps to set up the project locally:
 3. **Frontend Setup**  
    - Navigate to the client directory:  
      ```bash
-     cd Meeting-Genius/client
+     cd client
      ```  
    - Install dependencies:  
      ```bash
@@ -142,12 +142,7 @@ Click below to watch a walkthrough of the project!
 
  
 
----
 
-## 🚀 Future Enhancements  
-
-- 🌍 **Live Deployment**: Deploy the app on a cloud service.  
-- 🤖 **Advanced Summarization**: Incorporate domain-specific AI models.  
-- 📊 **Analytics Dashboard**: Visualize meeting insights with charts and graphs.  
+ 
 
 ---
