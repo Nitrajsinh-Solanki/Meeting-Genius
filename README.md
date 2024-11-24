@@ -119,7 +119,7 @@ Follow these steps to set up the project locally:
 ## 📚 Workflow  
 
 ### Input  
-Upload meeting audio/video files. The app automatically transcribes, summarizes, and generates visual insights.  
+Upload meeting audio files. The app automatically transcribes, summarizes, and generates visual insights.  
 
 ### Processing  
 - **Speech-to-Text**: Extracts text from audio using AssemblyAI.  
