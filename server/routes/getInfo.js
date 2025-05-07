@@ -1,3 +1,5 @@
+// Meeting-Genius\server\routes\getInfo.js
+
 import express from 'express';
 import getProcessedText from '../controllers/processedTextController.js';
 

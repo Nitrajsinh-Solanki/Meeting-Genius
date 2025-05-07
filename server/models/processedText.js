@@ -1,12 +1,20 @@
 
-
-import mongoose, { model } from "mongoose";
-
+// Meeting-Genius\server\models\processedText.js
+import mongoose from "mongoose";
 
 const ProcessedTextSchema = new mongoose.Schema({
-    user_id: { type: String ,required: true},
-    session_id: { type: String,required: true },  
-    result: { type: String },
+    user_id: { 
+        type: String,
+        required: true,
+        default: "default-user-id"  // Add default value
+    },
+    session_id: { 
+        type: String,
+        required: true 
+    },
+    result: { 
+        type: String 
+    },
     highlights: [
         {
             text: { type: String },
@@ -21,8 +29,7 @@ const ProcessedTextSchema = new mongoose.Schema({
         audio_url: { type: String }
     },
     image_urls: [[{ type: String }]],
-},
-{
+},{
     timestamps: true,
 });
 

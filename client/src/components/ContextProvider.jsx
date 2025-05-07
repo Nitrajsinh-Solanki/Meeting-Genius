@@ -1,17 +1,13 @@
-
+// Meeting-Genius\client\src\components\ContextProvider.jsx
 
 import PropTypes from "prop-types";
-import { createContext, useState } from "react";
+import { createContext } from "react";
+
 const authContext = createContext();
+
 const ContextProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const value = {
-    user,
-    setUser,
-    showAuthModal,
-    setShowAuthModal,
-  };
+  const value = {};
+  
   return <authContext.Provider value={value}>{children}</authContext.Provider>;
 };
 

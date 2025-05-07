@@ -1,44 +1,64 @@
-
+// Meeting-Genius\server\utils\imageGeneration.js
 import { fetch } from 'undici';
-import { configDotenv } from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+import { v2 as cloudinary } from 'cloudinary';
 import ProcessedText from '../models/processedText.js';
 
-configDotenv();
+// Use dotenv.config() instead of configDotenv()
+dotenv.config();
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_KEY;
-const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET;
+// Configure Cloudinary with proper environment variables
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true
+});
+
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const uploadImageToSupabase = async (imageBuffer, fileName) => {
+const uploadImageToCloudinary = async (imageBuffer, fileName) => {
   try {
-    const { data, error } = await supabase.storage
-      .from(SUPABASE_BUCKET)
-      .upload(`images/${fileName}`, imageBuffer, {
-        contentType: 'image/png',
-        upsert: true,
-      });
+    // Log Cloudinary configuration for debugging
+    console.log("Cloudinary Config:", {
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY ? "Set" : "Not set",
+      api_secret: process.env.CLOUDINARY_API_SECRET ? "Set" : "Not set"
+    });
 
-    if (error) throw new Error(error.message);
-
-    const publicUrl = supabase.storage
-      .from(SUPABASE_BUCKET)
-      .getPublicUrl(`images/${fileName}`).data.publicUrl;
-
-    if (!publicUrl) throw new Error('Failed to generate public URL');
-
-    return publicUrl;
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'meeting-genius',
+          public_id: fileName,
+          resource_type: 'image'
+        },
+        (error, result) => {
+          if (error) {
+            console.error('Error uploading to Cloudinary:', error);
+            reject(error);
+          } else {
+            resolve(result.secure_url);
+          }
+        }
+      );
+      uploadStream.end(imageBuffer);
+    });
   } catch (error) {
-    console.error('Error uploading to Supabase:', error.message);
+    console.error('Error in uploadImageToCloudinary:', error.message);
     return null;
   }
 };
 
 const fetchImageFromPexels = async (keyword) => {
   try {
+    // Log Pexels API key status for debugging
+    console.log(`Fetching image for keyword "${keyword}" with Pexels API key: ${PEXELS_API_KEY ? "Set" : "Not set"}`);
+
+    if (!PEXELS_API_KEY) {
+      console.error("Pexels API key is missing");
+      return null;
+    }
 
     const response = await fetch(
       `https://api.pexels.com/v1/search?query=${encodeURIComponent(keyword)}&per_page=1`,
@@ -51,22 +71,26 @@ const fetchImageFromPexels = async (keyword) => {
     );
 
     if (!response.ok) {
-      console.error(`Pexels API error: ${response.statusText}`);
+      console.error(`Pexels API error: ${response.status} ${response.statusText}`);
       return null;
     }
 
-    const { photos } = await response.json();
+    const data = await response.json();
+    const { photos } = data;
+
     if (!photos || photos.length === 0) {
       console.error(`No images found for keyword: ${keyword}`);
       return null;
     }
 
     const imageUrl = photos[0].src.large;
+    console.log(`Found image for "${keyword}": ${imageUrl}`);
+
     const imageResponse = await fetch(imageUrl);
     const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-    const fileName = `${keyword.replace(/\s+/g, '_')}_${Date.now()}.png`;
-
-    return await uploadImageToSupabase(imageBuffer, fileName);
+    const fileName = `${keyword.replace(/\s+/g, '_')}_${Date.now()}`;
+    
+    return await uploadImageToCloudinary(imageBuffer, fileName);
   } catch (error) {
     console.error(`Error fetching image for keyword "${keyword}":`, error.message);
     return null;
@@ -81,18 +105,37 @@ export const updateDatabaseWithImages = async (sessionId) => {
       return;
     }
 
-    const highlights = processedText.highlights;
-    const imageUrls = [];
+    const highlights = processedText.highlights || [];
+    console.log(`Found ${highlights.length} highlights for session ${sessionId}`);
 
-    for (const highlight of highlights) {
+    const imageUrls = [];
+    // Use only 5 highlights to avoid too many API calls
+    const limitedHighlights = highlights.slice(0, 5);
+
+    for (const highlight of limitedHighlights) {
       const imageUrl = await fetchImageFromPexels(highlight.text);
-      if (imageUrl) imageUrls.push(imageUrl);
+      if (imageUrl) {
+        console.log(`Added image for "${highlight.text}": ${imageUrl}`);
+        imageUrls.push(imageUrl);
+      }
+    }
+
+    // If no highlights or no images found, try some generic meeting-related keywords
+    if (imageUrls.length === 0) {
+      const genericKeywords = ["business meeting", "conference", "team collaboration", "presentation", "discussion"];
+      for (const keyword of genericKeywords) {
+        const imageUrl = await fetchImageFromPexels(keyword);
+        if (imageUrl) {
+          console.log(`Added generic image for "${keyword}": ${imageUrl}`);
+          imageUrls.push(imageUrl);
+          if (imageUrls.length >= 3) break; // Get at least 3 images
+        }
+      }
     }
 
     processedText.image_urls = imageUrls;
     await processedText.save();
-
-   
+    console.log(`Saved ${imageUrls.length} images to database for session ${sessionId}`);
   } catch (error) {
     console.error('Error updating database with images:', error.message);
   }
