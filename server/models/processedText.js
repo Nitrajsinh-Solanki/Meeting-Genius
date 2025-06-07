@@ -6,7 +6,7 @@ const ProcessedTextSchema = new mongoose.Schema({
     user_id: { 
         type: String,
         required: true,
-        default: "default-user-id"  // Add default value
+        default: "default-user-id" 
     },
     session_id: { 
         type: String,
